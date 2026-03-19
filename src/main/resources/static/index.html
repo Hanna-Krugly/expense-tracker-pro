@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Expense Tracker Pro</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f7f6; }
+        h2 { color: #2c3e50; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #27ae60; color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .total { font-weight: bold; font-size: 1.2em; margin-top: 20px; color: #e74c3c; }
+    </style>
+</head>
+<body>
+
+<h2>Moje Wydatki</h2>
+
+<table>
+    <thead>
+    <tr>
+        <th>Opis</th>
+        <th>Kwota (PLN)</th>
+        <th>Data</th>
+        <th>Kategoria</th>
+    </tr>
+    </thead>
+    <tbody id="expense-table">
+    </tbody>
+</table>
+
+<div class="total" id="total-amount">Suma: 0 PLN</div>
+
+<script>
+    // Ta funkcja pobiera dane z Twojego adresu /expenses
+    fetch('/expenses')
+        .then(response => response.json())
+        .then(data => {
+            const tableBody = document.getElementById('expense-table');
+            let total = 0;
+
+            data.forEach(expense => {
+                const row = `<tr>
+                    <td>${expense.description}</td>
+                    <td>${expense.amount}</td>
+                    <td>${expense.date}</td>
+                    <td>${expense.category}</td>
+                </tr>`;
+                tableBody.innerHTML += row;
+                total += expense.amount;
+            });
+
+            document.getElementById('total-amount').innerText = `Suma: ${total.toFixed(2)} PLN`;
+        });
+</script>
+</body>
+</html>
