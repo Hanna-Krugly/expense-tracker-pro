@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker Pro</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+            margin-top: 50px;
+            background-color: rgba(255, 255, 255, 0.95); /* Białe, lekko przezroczyste tło */
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            height: fit-content;
+        }
+
+        h2 { color: #2c3e50; text-align: center; margin-top: 0; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
+
+        th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }
+
+        th { background-color: #27ae60; color: white; text-transform: uppercase; font-size: 0.85em; }
+
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #f1f1f1; }
+
+        .total-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 2px solid #eee;
+        }
+
+        .total-label { font-size: 1.2em; color: #7f8c8d; margin-right: 10px; }
+        .total-value { font-weight: bold; font-size: 1.5em; color: #2c3e50; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>EXPENSE HISTORY</h2>
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #e9ecef;">
+        <h3 style="margin-top: 0; color: #2c3e50; font-size: 1em; text-transform: uppercase;">Add New Expense</h3>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <input type="text" id="description" placeholder="Description (e.g. Coffee)" style="flex: 2; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+            <input type="number" id="amount" placeholder="Amount" step="0.01" style="flex: 1; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+            <select id="category" style="flex: 1; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+                <option value="FOOD">Food</option>
+                <option value="TRANSPORT">Transport</option>
+                <option value="ENTERTAINMENT">Entertainment</option>
+                <option value="HEALTH">Health</option>
+                <option value="OTHER">Other</option>
+            </select>
+            <button onclick="addExpense()" style="background: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                ADD +
+            </button>
+        </div>
+    </div>
+
+    <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px; background: #f8f9fa; padding: 10px; border-radius: 8px; border: 1px solid #e9ecef;">
+        <label for="filter-category" style="font-weight: bold; color: #2c3e50;">Filter by Category:</label>
+        <select id="filter-category" onchange="filterExpenses()" style="padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+            <option value="ALL">All Categories</option>
+            <option value="FOOD">Food</option>
+            <option value="TRANSPORT">Transport</option>
+            <option value="ENTERTAINMENT">Entertainment</option>
+            <option value="HEALTH">Health</option>
+            <option value="OTHER">Other</option>
+        </select>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Description</th>
+            <th>Amount (PLN)</th>
+            <th>Date</th>
+            <th>Category</th>
+            <th>Action</th> </tr>
+        </thead>
+        <tbody id="expense-table">
+        </tbody>
+    </table>
+
+    <div class="total-section">
+        <span class="total-label">Total spent:</span>
+        <span class="total-value" id="total-amount">0.00 PLN</span>
+    </div>
+    <div style="margin-top: 40px; max-width: 400px; margin-left: auto; margin-right: auto;">
+        <canvas id="expenseChart"></canvas>
+    </div>
+</div>
+
+<script>
+    // 1. Ładowanie listy wydatków przy starcie
+    function loadExpenses() {
+        fetch('/expenses')
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementById('expense-table');
+                let total = 0;
+                tableBody.innerHTML = "";
+
+                data.forEach(expense => {
+                    const row = `<tr>
+                        <td>${expense.description}</td>
+                        <td>${expense.amount.toFixed(2)}</td>
+                        <td>${expense.date}</td>
+                        <td>${expense.category}</td>
+                        <td>
+                            <button onclick="deleteExpense('${expense.id}')" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>`;
+                    tableBody.innerHTML += row;
+                    total += expense.amount;
+                });
+
+                document.getElementById('total-amount').innerText = `${total.toFixed(2)} PLN`;
+                updateChart(data);
+            })
+            .catch(error => console.error('Error fetching expenses:', error));
+    }
+
+    // Uruchom ładowanie od razu
+    loadExpenses();
+
+    // 2. Dodawanie wydatku
+    function addExpense() {
+        const description = document.getElementById('description').value;
+        const amount = document.getElementById('amount').value;
+        const category = document.getElementById('category').value;
+
+        if (description.trim() === "" || amount <= 0) {
+            alert("Please enter valid description and amount!");
+            return;
+        }
+
+        const expense = {
+            description: description,
+            amount: parseFloat(amount),
+            category: category,
+            date: new Date().toISOString().split('T')[0]
+        };
+
+        fetch('/expenses', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(expense)
+        })
+        .then(response => {
+            if (response.ok) {
+                // Dajemy Javie 500ms na zapisanie pliku i odświeżamy
+                setTimeout(() => { location.reload(); }, 500);
+            } else {
+                alert("Error adding expense!");
+            }
+        });
+    }
+
+    // 3. Usuwanie wydatku
+    function deleteExpense(id) {
+        if (confirm("Are you sure you want to delete this item?")) {
+            fetch(`/expenses/${id}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    setTimeout(() => { location.reload(); }, 500);
+                } else {
+                    alert("Error deleting expense!");
+                }
+            });
+        }
+    }
+    function filterExpenses() {
+        const selectedCategory = document.getElementById('filter-category').value;
+        const tableRows = document.querySelectorAll('#expense-table tr');
+        let newTotal = 0;
+
+        tableRows.forEach(row => {
+            // Czwarta komórka (indeks 3) zawiera nazwę kategorii
+            const categoryCell = row.cells[3].innerText;
+            // Druga komórka (indeks 1) zawiera kwotę
+            const amountCell = parseFloat(row.cells[1].innerText);
+
+            if (selectedCategory === "ALL" || categoryCell === selectedCategory) {
+                row.style.display = ""; // Pokaż wiersz
+                newTotal += amountCell;
+            } else {
+                row.style.display = "none"; // Ukryj wiersz
+            }
+        });
+
+        // Aktualizujemy sumę tylko dla tych wydatków, które widać!
+        document.getElementById('total-amount').innerText = `${newTotal.toFixed(2)} PLN`;
+    }
+    let myChart;
+    function updateChart(data) {
+        const ctx = document.getElementById('expenseChart').getContext('2d');
+        const categories = ["FOOD", "TRANSPORT", "ENTERTAINMENT", "HEALTH", "OTHER"];
+        const totals = categories.map(cat => {
+            return data.filter(exp => exp.category === cat).reduce((sum, exp) => sum + exp.amount, 0);
+        });
+
+        if (myChart) { myChart.destroy(); }
+        myChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: categories,
+                datasets: [{
+                    data: totals,
+                    backgroundColor: ['#27ae60', '#3498db', '#f1c40f', '#e74c3c', '#9b59b6']
+                }]
+            }
+        });
+    }
+</script>
+</body>
+</html>
