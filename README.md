@@ -27,3 +27,7 @@ Aplikacja oblicza sumę wydatków w czasie rzeczywistym. Jeśli dodasz nowy wyda
 
 ---
 *Projekt stworzony w ramach intensywnej nauki programowania obiektowego i webowego.*
+
+<p align="center">
+  <img src="dashboard.png" alt="Smart Wallet Dashboard" width="80%">
+</p>
