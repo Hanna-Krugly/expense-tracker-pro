@@ -1,32 +1,34 @@
-#  Smart Wallet Pro | Full-Stack Java Application
+#  Smart Wallet Pro | Full-Stack Finance Manager
 
 ![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Spring](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 
-To nie jest zwykła tabela wydatków. To kompletna aplikacja **Full-Stack**, która łączy logikę biznesową napisaną w Javie z dynamicznym, interaktywnym front-endem.
+A modern Full-Stack application for personal finance management. Built with a focus on clean code, RESTful architecture, and interactive data visualization.
 
-##  Co wyróżnia ten projekt?
+##  Key Features
 
-* **Interaktywna Wizualizacja**: Zintegrowałam bibliotekę **Chart.js**, aby wydatki nie były tylko nudnymi liczbami, ale czytelnym wykresem kołowym.
-* **Inteligentne Filtrowanie**: System pozwala na natychmiastowe filtrowanie transakcji po kategoriach (Jedzenie, Rozrywka, Transport) bez przeładowywania strony.
-* **Architektura REST**: Komunikacja między Frontem a Backem odbywa się poprzez czyste API (Fetch API).
-* **Trwałość Danych**: System automatycznie zapisuje i odczytuje dane z pliku lokalnego, symulując działanie bazy danych.
+* **Interactive Dashboard**: Integrated **Chart.js** for real-time visual spending analysis.
+* **Dynamic Filtering**: Instantly filter transactions by category (Food, Entertainment, Transport) without page reloads.
+* **RESTful API**: Clean communication between Spring Boot backend and JavaScript frontend using Fetch API.
+* **Data Persistence**: Automatic data storage in a local file system, simulating database behavior.
 
-##  Stack Techniczny
+##  Tech Stack
 
-| Warstwa | Technologia |
+| Layer | Technology |
 | :--- | :--- |
 | **Backend** | Java 17, Spring Boot 3, Maven |
 | **Frontend** | Modern JavaScript (ES6+), HTML5, CSS3 |
-| **Analiza danych** | Chart.js (Data Visualization) |
+| **Data Viz** | Chart.js |
 
-##  Jak to działa? (Logika)
+##  Preview
 
-Aplikacja oblicza sumę wydatków w czasie rzeczywistym. Jeśli dodasz nowy wydatek przez formularz, Java odbiera dane, zapisuje je w `expenses.txt`, a JavaScript odświeża wykres, by odzwierciedlał aktualny stan Twojego portfela.
+<p align="center">
+  <img src="dashboard.png" alt="Smart Wallet Dashboard" width="80%">
+</p>
 
 ---
-*Projekt stworzony w ramach intensywnej nauki programowania obiektowego i webowego.*
+*Project developed to master Object-Oriented Programming and Web Development patterns.*
 
 <p align="center">
   <img src="dashboard.png" alt="Smart Wallet Dashboard" width="80%">
